@@ -1,0 +1,1498 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>2026 奧地利行程｜台灣－維也納－薩爾斯堡</title>
+  <style>
+    :root {
+      --bg: #f4f7f2;
+      --panel: #ffffff;
+      --ink: #1f2933;
+      --muted: #65726c;
+      --line: #d8e3dc;
+      --green: #5aa47b;
+      --green-dark: #2f7d58;
+      --green-soft: #e8f3ec;
+      --gold: #c99a3e;
+      --gold-soft: #fbf1dc;
+      --blue: #496a8f;
+      --blue-soft: #e8eef6;
+      --rose: #a95d68;
+      --rose-soft: #f7e8eb;
+      --shadow: 0 18px 48px rgba(31, 41, 51, 0.10);
+      --radius: 18px;
+      --sidebar: 292px;
+      --topbar: 68px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 8% 6%, rgba(90, 164, 123, 0.16), transparent 26%),
+        radial-gradient(circle at 92% 0%, rgba(201, 154, 62, 0.13), transparent 24%),
+        linear-gradient(180deg, #fbfcf8 0%, var(--bg) 100%);
+      line-height: 1.55;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    .layout {
+      display: grid;
+      grid-template-columns: var(--sidebar) minmax(0, 1fr);
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      padding: 18px 16px;
+      background: rgba(255, 255, 255, 0.86);
+      border-right: 1px solid var(--line);
+      backdrop-filter: blur(16px);
+      overflow-y: auto;
+    }
+
+    .brand {
+      padding: 18px;
+      border-radius: 22px;
+      background: linear-gradient(135deg, var(--green-dark), var(--blue));
+      color: #fff;
+      box-shadow: var(--shadow);
+    }
+
+    .brand .kicker {
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      opacity: 0.78;
+      margin-bottom: 8px;
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: 24px;
+      line-height: 1.16;
+      letter-spacing: -0.04em;
+    }
+
+    .brand p {
+      margin: 12px 0 0;
+      color: rgba(255,255,255,0.86);
+      font-size: 14px;
+    }
+
+    .side-block {
+      margin-top: 14px;
+      padding: 14px;
+      border-radius: 18px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+    }
+
+    .side-title {
+      margin: 0 0 10px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .quick-stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .stat {
+      padding: 10px;
+      border-radius: 14px;
+      background: var(--green-soft);
+    }
+
+    .stat span {
+      display: block;
+      color: var(--green-dark);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .stat strong {
+      display: block;
+      margin-top: 2px;
+      font-size: 15px;
+      line-height: 1.25;
+    }
+
+    .side-nav {
+      display: grid;
+      gap: 6px;
+    }
+
+    .side-nav a {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      color: var(--ink);
+      font-weight: 800;
+      font-size: 14px;
+      transition: 0.16s ease;
+    }
+
+    .side-nav a:hover {
+      background: var(--green-soft);
+      color: var(--green-dark);
+      transform: translateX(2px);
+    }
+
+    .mini-days {
+      display: grid;
+      gap: 6px;
+      max-height: 314px;
+      overflow: auto;
+      padding-right: 2px;
+    }
+
+    .mini-day {
+      display: grid;
+      grid-template-columns: 48px 1fr;
+      gap: 9px;
+      align-items: center;
+      padding: 9px;
+      border-radius: 14px;
+      background: #fafcf9;
+      border: 1px solid transparent;
+    }
+
+    .mini-day:hover { border-color: var(--line); background: #fff; }
+    .mini-day b { color: var(--green-dark); font-size: 13px; }
+    .mini-day span { font-size: 13px; color: var(--ink); line-height: 1.25; }
+
+    .main {
+      min-width: 0;
+      padding: 22px;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      height: var(--topbar);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 0 4px 12px;
+      background: linear-gradient(180deg, rgba(244,247,242,0.96) 0%, rgba(244,247,242,0.76) 72%, transparent 100%);
+      backdrop-filter: blur(10px);
+    }
+
+    .topbar strong {
+      font-size: 20px;
+      letter-spacing: -0.03em;
+    }
+
+    .topbar-actions { display: flex; gap: 8px; align-items: center; }
+
+    .button {
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: #fff;
+      color: var(--ink);
+      padding: 9px 13px;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: 0 6px 18px rgba(31,41,51,0.05);
+    }
+
+    .button.primary {
+      background: var(--green-dark);
+      color: #fff;
+      border-color: var(--green-dark);
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 320px;
+      gap: 16px;
+      align-items: stretch;
+      margin-bottom: 16px;
+    }
+
+    .hero-card {
+      border-radius: 26px;
+      background:
+        linear-gradient(135deg, rgba(47, 125, 88, 0.96), rgba(73, 106, 143, 0.94)),
+        url("https://images.unsplash.com/photo-1516550893923-42d28e5677af?auto=format&fit=crop&w=1600&q=80") center/cover;
+      color: #fff;
+      padding: 26px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .hero-card::after {
+      content: "";
+      position: absolute;
+      right: -120px;
+      bottom: -150px;
+      width: 330px;
+      height: 330px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.13);
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.28);
+      background: rgba(255,255,255,0.14);
+      font-size: 13px;
+      margin-bottom: 14px;
+    }
+
+    .hero-card h2 {
+      position: relative;
+      z-index: 1;
+      margin: 0;
+      font-size: clamp(30px, 4vw, 48px);
+      line-height: 1.08;
+      letter-spacing: -0.05em;
+      max-width: 720px;
+    }
+
+    .hero-card p {
+      position: relative;
+      z-index: 1;
+      margin: 14px 0 0;
+      max-width: 780px;
+      font-size: 16px;
+      color: rgba(255,255,255,0.90);
+    }
+
+    .summary-card {
+      border-radius: 26px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      box-shadow: 0 12px 32px rgba(31,41,51,0.07);
+      padding: 18px;
+    }
+
+    .summary-card h3 { margin: 0 0 12px; font-size: 18px; }
+
+    .progress {
+      position: relative;
+      height: 8px;
+      border-radius: 999px;
+      background: var(--green-soft);
+      overflow: hidden;
+      margin: 12px 0 16px;
+    }
+
+    .progress::after {
+      content: "";
+      position: absolute;
+      inset: 0 auto 0 0;
+      width: 64%;
+      background: linear-gradient(90deg, var(--green), var(--gold));
+      border-radius: inherit;
+    }
+
+    .compact-list {
+      display: grid;
+      gap: 9px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .compact-list li {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      border-bottom: 1px dashed var(--line);
+      padding-bottom: 7px;
+    }
+
+    .compact-list li:last-child { border-bottom: 0; padding-bottom: 0; }
+    .compact-list strong { color: var(--ink); text-align: right; }
+
+    .section {
+      margin-top: 16px;
+      scroll-margin-top: 84px;
+    }
+
+    .section-head {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 16px;
+      margin: 0 2px 10px;
+    }
+
+    .section-head h2 {
+      margin: 0;
+      font-size: 22px;
+      letter-spacing: -0.03em;
+    }
+
+    .section-head p { margin: 0; color: var(--muted); font-size: 14px; }
+
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: 1.05fr 0.95fr;
+      gap: 14px;
+    }
+
+    .card {
+      background: rgba(255,255,255,0.92);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: 0 10px 28px rgba(31, 41, 51, 0.06);
+      overflow: hidden;
+    }
+
+    .card-pad { padding: 18px; }
+
+    .route {
+      display: grid;
+      grid-template-columns: 1fr 44px 1fr;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .airport {
+      padding: 14px;
+      border-radius: 16px;
+      background: var(--green-soft);
+      min-height: 86px;
+    }
+
+    .airport small {
+      display: block;
+      color: var(--green-dark);
+      font-weight: 900;
+      font-size: 12px;
+      margin-bottom: 4px;
+    }
+
+    .airport strong { display: block; font-size: 17px; line-height: 1.25; }
+
+    .plane {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: #fff;
+      border: 1px solid var(--line);
+      color: var(--green-dark);
+      font-size: 22px;
+      box-shadow: 0 8px 20px rgba(31,41,51,0.08);
+    }
+
+    .flight-compact {
+      display: grid;
+      gap: 8px;
+    }
+
+    .flight-row {
+      display: grid;
+      grid-template-columns: 58px 72px 1fr 1fr;
+      gap: 10px;
+      align-items: center;
+      padding: 10px;
+      border-radius: 14px;
+      background: #fafcf9;
+      border: 1px solid var(--line);
+      font-size: 14px;
+    }
+
+    .label {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 48px;
+      padding: 5px 8px;
+      border-radius: 999px;
+      background: var(--green-soft);
+      color: var(--green-dark);
+      font-weight: 900;
+      font-size: 12px;
+    }
+
+    .mini-title { color: var(--muted); font-size: 12px; }
+    .time { font-size: 17px; font-weight: 900; letter-spacing: -0.02em; }
+    .note { color: var(--muted); font-size: 12px; margin-top: 1px; }
+
+    .hotel-grid {
+      display: grid;
+      gap: 10px;
+    }
+
+    .hotel {
+      padding: 14px;
+      border-radius: 16px;
+      background: #fafcf9;
+      border: 1px solid var(--line);
+    }
+
+    .hotel .city {
+      color: var(--green-dark);
+      font-size: 13px;
+      font-weight: 900;
+      margin-bottom: 3px;
+    }
+
+    .hotel h3 {
+      margin: 0 0 8px;
+      font-size: 18px;
+      letter-spacing: -0.02em;
+    }
+
+    .hotel dl {
+      display: grid;
+      grid-template-columns: 72px 1fr;
+      gap: 3px 10px;
+      margin: 0;
+      font-size: 14px;
+    }
+
+    .hotel dt { color: var(--muted); }
+    .hotel dd { margin: 0; }
+
+    .tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 0 0 10px;
+    }
+
+    .tab-btn {
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.9);
+      color: var(--ink);
+      border-radius: 999px;
+      padding: 8px 12px;
+      cursor: pointer;
+      font-weight: 900;
+      font-size: 13px;
+      transition: 0.16s ease;
+    }
+
+    .tab-btn:hover,
+    .tab-btn.active {
+      background: var(--green-dark);
+      color: #fff;
+      border-color: var(--green-dark);
+    }
+
+    .itinerary {
+      display: grid;
+      gap: 10px;
+    }
+
+    .day {
+      display: grid;
+      grid-template-columns: 84px minmax(0, 1fr);
+      gap: 14px;
+      padding: 14px;
+      border-radius: var(--radius);
+      background: rgba(255,255,255,0.94);
+      border: 1px solid var(--line);
+      box-shadow: 0 8px 22px rgba(31,41,51,0.05);
+      scroll-margin-top: 84px;
+    }
+
+    .datebox {
+      min-height: 92px;
+      border-radius: 16px;
+      background: linear-gradient(160deg, var(--green-dark), var(--green));
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 10px;
+    }
+
+    .datebox .md { font-size: 23px; font-weight: 950; letter-spacing: -0.04em; }
+    .datebox .weekday { font-size: 12px; opacity: 0.86; margin-top: 2px; }
+
+    .day-main h3 {
+      margin: 0 0 6px;
+      font-size: 19px;
+      letter-spacing: -0.03em;
+    }
+
+    .badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 9px;
+    }
+
+    .badge {
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: var(--green-soft);
+      color: var(--green-dark);
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .badge.gold { background: var(--gold-soft); color: #835d19; }
+    .badge.blue { background: var(--blue-soft); color: #355579; }
+    .badge.rose { background: var(--rose-soft); color: #85404a; }
+
+    .plans {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .plan {
+      padding: 11px 12px;
+      border-radius: 14px;
+      background: #fafcf9;
+      border: 1px solid var(--line);
+      font-size: 14px;
+    }
+
+    .plan strong {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      margin-bottom: 3px;
+    }
+
+    .plan p { margin: 0; }
+
+    .tips {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .checklist-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .check-card {
+      padding: 16px;
+      border-radius: var(--radius);
+      background: #fff;
+      border: 1px solid var(--line);
+      box-shadow: 0 8px 22px rgba(31,41,51,0.05);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .check-card h3 {
+      margin: 0 0 4px;
+      font-size: 17px;
+      letter-spacing: -0.02em;
+    }
+
+    .check-card label {
+      display: flex;
+      align-items: flex-start;
+      gap: 9px;
+      font-size: 14px;
+      line-height: 1.45;
+      cursor: pointer;
+      color: var(--ink);
+    }
+
+    .check-card input[type="checkbox"] {
+      margin-top: 2px;
+      width: 16px;
+      height: 16px;
+      flex: 0 0 16px;
+      accent-color: var(--green-dark);
+    }
+
+    .check-card label:has(input:checked) {
+      color: var(--muted);
+      text-decoration: line-through;
+      text-decoration-thickness: 1px;
+    }
+
+    .tip {
+      padding: 16px;
+      border-radius: var(--radius);
+      background: #fff;
+      border: 1px solid var(--line);
+      box-shadow: 0 8px 22px rgba(31,41,51,0.05);
+    }
+
+    .tip-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 13px;
+      background: var(--green-soft);
+      display: grid;
+      place-items: center;
+      font-size: 20px;
+      margin-bottom: 10px;
+    }
+
+    .tip h3 { margin: 0 0 6px; font-size: 17px; }
+    .tip p { margin: 0; color: var(--muted); font-size: 14px; }
+
+    .privacy {
+      margin-top: 16px;
+      padding: 13px 16px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: rgba(255,255,255,0.78);
+      color: var(--muted);
+      font-size: 13px;
+      text-align: center;
+    }
+
+    @media (max-width: 1120px) {
+      :root { --sidebar: 252px; }
+      .hero { grid-template-columns: 1fr; }
+      .dashboard-grid { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 820px) {
+      .layout { grid-template-columns: 1fr; }
+      .sidebar {
+        position: relative;
+        height: auto;
+        border-right: 0;
+        border-bottom: 1px solid var(--line);
+      }
+      .mini-days { max-height: none; grid-template-columns: repeat(2, minmax(0,1fr)); }
+      .main { padding: 16px; }
+      .topbar { position: relative; height: auto; padding: 0 0 12px; }
+      .route { grid-template-columns: 1fr; }
+      .plane { transform: rotate(90deg); justify-self: center; }
+      .flight-row { grid-template-columns: 1fr 1fr; }
+      .day { grid-template-columns: 1fr; }
+      .datebox { min-height: auto; align-items: flex-start; }
+      .plans, .tips, .checklist-grid { grid-template-columns: 1fr; }
+    }
+
+    @media print {
+      @page {
+        size: A4 portrait;
+        margin: 9mm 8mm;
+      }
+
+      * {
+        box-shadow: none !important;
+        text-shadow: none !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+
+      html,
+      body {
+        width: 210mm;
+        background: #fff !important;
+        color: #111827;
+        font-size: 10.2pt;
+        line-height: 1.28;
+      }
+
+      .layout {
+        display: block;
+        min-height: auto;
+      }
+
+      .sidebar,
+      .topbar,
+      .tabs,
+      .print-toast {
+        display: none !important;
+      }
+
+      .main {
+        width: 100%;
+        padding: 0;
+      }
+
+      .hero {
+        display: block;
+        margin: 0 0 5mm;
+      }
+
+      .hero-card {
+        padding: 7mm 8mm;
+        border-radius: 8px;
+        background: linear-gradient(135deg, #2f7d58, #496a8f) !important;
+      }
+
+      .hero-card::after,
+      .eyebrow {
+        display: none;
+      }
+
+      .hero-card h2 {
+        font-size: 19pt;
+        line-height: 1.12;
+        max-width: none;
+      }
+
+      .hero-card p {
+        margin-top: 3mm;
+        font-size: 10.2pt;
+        line-height: 1.35;
+        max-width: none;
+      }
+
+      .summary-card {
+        display: none;
+      }
+
+      .section {
+        margin-top: 4mm;
+        break-inside: auto;
+        page-break-inside: auto;
+      }
+
+      .section-head {
+        margin: 0 0 2mm;
+        padding-bottom: 1.2mm;
+        border-bottom: 1px solid #cfd8d2;
+      }
+
+      .section-head h2 {
+        font-size: 15pt;
+        line-height: 1.1;
+      }
+
+      .section-head p {
+        font-size: 8.8pt;
+      }
+
+      .dashboard-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 3mm;
+      }
+
+      .card,
+      .day,
+      .tip,
+      .check-card,
+      .hotel,
+      .plan,
+      .airport,
+      .flight-row {
+        border: 1px solid #cfd8d2 !important;
+        background: #fff !important;
+        border-radius: 6px !important;
+      }
+
+      .card,
+      .tip,
+      .check-card {
+        break-inside: avoid;
+        page-break-inside: avoid;
+      }
+
+      .card-pad {
+        padding: 3.5mm;
+      }
+
+      .route {
+        grid-template-columns: 1fr 24px 1fr;
+        gap: 2mm;
+        margin-bottom: 2.5mm;
+      }
+
+      .airport {
+        min-height: auto;
+        padding: 2.2mm;
+      }
+
+      .airport small,
+      .mini-title,
+      .note,
+      .hotel dt,
+      .plan strong {
+        font-size: 8pt;
+      }
+
+      .airport strong {
+        font-size: 10pt;
+      }
+
+      .plane {
+        width: 24px;
+        height: 24px;
+        font-size: 12pt;
+        border-radius: 50% !important;
+      }
+
+      .flight-compact,
+      .hotel-grid,
+      .itinerary {
+        gap: 2mm;
+      }
+
+      .flight-row {
+        grid-template-columns: 36px 44px 1fr 1fr;
+        gap: 2mm;
+        padding: 2mm;
+      }
+
+      .label,
+      .badge {
+        background: #eef5f0 !important;
+        color: #255f43 !important;
+        border-radius: 999px !important;
+        font-size: 7.6pt;
+        padding: 1mm 1.8mm;
+      }
+
+      .time {
+        font-size: 10.5pt;
+      }
+
+      .hotel {
+        padding: 2.5mm;
+      }
+
+      .hotel .city {
+        font-size: 8.2pt;
+      }
+
+      .hotel h3 {
+        margin-bottom: 1.5mm;
+        font-size: 11pt;
+      }
+
+      .hotel dl {
+        grid-template-columns: 15mm 1fr;
+        gap: 0.8mm 2mm;
+        font-size: 8.8pt;
+        line-height: 1.25;
+      }
+
+      .day {
+        grid-template-columns: 18mm minmax(0, 1fr);
+        gap: 2.5mm;
+        padding: 2.5mm;
+        margin: 0;
+        break-inside: avoid;
+        page-break-inside: avoid;
+      }
+
+      .datebox {
+        min-height: 17mm;
+        padding: 1.6mm;
+        border-radius: 5px;
+        background: #2f7d58 !important;
+      }
+
+      .datebox .md {
+        font-size: 12pt;
+      }
+
+      .datebox .weekday {
+        font-size: 7.5pt;
+      }
+
+      .day-main h3 {
+        margin-bottom: 1mm;
+        font-size: 11.3pt;
+        line-height: 1.15;
+      }
+
+      .badges {
+        gap: 1.2mm;
+        margin-bottom: 1.5mm;
+      }
+
+      .plans {
+        grid-template-columns: 1fr 1fr;
+        gap: 2mm;
+      }
+
+      .plan {
+        padding: 2mm;
+        font-size: 8.8pt;
+        line-height: 1.26;
+      }
+
+      .tips {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 2.5mm;
+      }
+
+      .tip {
+        padding: 3mm;
+      }
+
+      .tip-icon {
+        display: none;
+      }
+
+      .tip h3 {
+        margin-bottom: 1mm;
+        font-size: 10.5pt;
+      }
+
+      .tip p {
+        font-size: 8.8pt;
+        line-height: 1.28;
+      }
+
+      .checklist-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 2.5mm;
+      }
+
+      .check-card {
+        padding: 3mm;
+        gap: 1.2mm;
+      }
+
+      .check-card h3 {
+        margin-bottom: 1mm;
+        font-size: 10.5pt;
+      }
+
+      .check-card label {
+        gap: 1.8mm;
+        font-size: 8.6pt;
+        line-height: 1.22;
+      }
+
+      .check-card input[type="checkbox"] {
+        width: 10px;
+        height: 10px;
+        flex-basis: 10px;
+        margin-top: 1px;
+      }
+
+      .privacy {
+        margin-top: 4mm;
+        padding: 2mm;
+        border-radius: 4px;
+        font-size: 8pt;
+        line-height: 1.25;
+      }
+    }
+  
+
+    .print-toast {
+      position: fixed;
+      right: 22px;
+      bottom: 22px;
+      z-index: 999;
+      max-width: 360px;
+      padding: 14px 16px;
+      border-radius: 16px;
+      background: rgba(31, 41, 51, 0.94);
+      color: #fff;
+      box-shadow: 0 18px 42px rgba(31,41,51,0.24);
+      font-size: 14px;
+      line-height: 1.5;
+      opacity: 0;
+      transform: translateY(12px);
+      pointer-events: none;
+      transition: 0.2s ease;
+    }
+
+    .print-toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    @media print {
+      .print-toast { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar" aria-label="行程側邊欄">
+      <div class="brand">
+        <div class="kicker">AMEE 2026 · Austria</div>
+        <h1>奧地利親子 × 醫學教育行程</h1>
+        <p>台灣 → 維也納 → 薩爾斯堡｜2026/08/16–08/27</p>
+      </div>
+
+      <div class="side-block">
+        <p class="side-title">行程摘要</p>
+        <div class="quick-stats">
+          <div class="stat"><span>天數</span><strong>12 天</strong></div>
+          <div class="stat"><span>城市</span><strong>2 城</strong></div>
+          <div class="stat"><span>住宿</span><strong>2 處</strong></div>
+          <div class="stat"><span>主軸</span><strong>AMEE＋親子</strong></div>
+        </div>
+      </div>
+
+      <div class="side-block">
+        <p class="side-title">快速導覽</p>
+        <nav class="side-nav">
+          <a href="#overview">✦ 總覽</a>
+          <a href="#flight">✈ 航班與住宿</a>
+          <a href="#itinerary">▦ 每日行程</a>
+          <a href="#packing">🧳 旅行必帶用品</a>
+          <a href="#tips">☑ 行程提醒</a>
+        </nav>
+      </div>
+
+      <div class="side-block">
+        <p class="side-title">每日索引</p>
+        <div class="mini-days">
+          <a class="mini-day" href="#d0816"><b>08/16</b><span>台灣出發</span></a>
+          <a class="mini-day" href="#d0817"><b>08/17</b><span>抵達・薩爾斯堡</span></a>
+          <a class="mini-day" href="#d0818"><b>08/18</b><span>國王湖</span></a>
+          <a class="mini-day" href="#d0819"><b>08/19</b><span>鹽礦・高堡</span></a>
+          <a class="mini-day" href="#d0820"><b>08/20</b><span>海爾布倫・維也納</span></a>
+          <a class="mini-day" href="#d0821"><b>08/21</b><span>大學參訪</span></a>
+          <a class="mini-day" href="#d0822"><b>08/22</b><span>熊布朗宮</span></a>
+          <a class="mini-day" href="#d0823"><b>08/23</b><span>博物館日</span></a>
+          <a class="mini-day" href="#d0824"><b>08/24</b><span>AMEE</span></a>
+          <a class="mini-day" href="#d0825"><b>08/25</b><span>瓦豪河谷</span></a>
+          <a class="mini-day" href="#d0826"><b>08/26</b><span>AMEE・返程</span></a>
+          <a class="mini-day" href="#d0827"><b>08/27</b><span>抵達台灣</span></a>
+        </div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <div class="topbar">
+        <strong>2026 Austria Itinerary</strong>
+        <div class="topbar-actions">
+          <button class="button" onclick="document.querySelector('.sidebar').scrollIntoView({behavior:'smooth'})">側欄</button>
+          <button class="button primary" type="button" id="printBtn">列印 / 存成 PDF</button>
+        </div>
+      </div>
+
+      <section class="hero" id="overview">
+        <div class="hero-card">
+          <div class="eyebrow">✈️ Taiwan → Vienna · Salzburg · AMEE</div>
+          <h2>把會議、城市文化與親子自然行程，壓縮成一張清楚的旅行工作台。</h2>
+          <p>核心邏輯：前段以薩爾斯堡與國王湖調整時差、累積親子自然行程；中後段移動到維也納，以 AMEE 會議為主軸，穿插醫學史、藝術、音樂互動與瓦豪河谷一日遊。</p>
+        </div>
+        <div class="summary-card">
+          <h3>目前規劃密度</h3>
+          <div class="progress" aria-label="行程密度"></div>
+          <ul class="compact-list">
+            <li><span>08/16–08/20</span><strong>移動＋薩爾斯堡</strong></li>
+            <li><span>08/20–08/26</span><strong>維也納住宿</strong></li>
+            <li><span>AMEE</span><strong>選擇性參與</strong></li>
+            <li><span>親子重點</span><strong>國王湖、鹽礦、動物園、音樂互動</strong></li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="section" id="flight">
+        <div class="section-head">
+          <div>
+            <h2>航班與住宿</h2>
+            <p>資訊集中，避免散在頁面各處。</p>
+          </div>
+        </div>
+
+        <div class="dashboard-grid">
+          <div class="card card-pad">
+            <div class="route" aria-label="flight route">
+              <div class="airport"><small>From</small><strong>台北桃園 TPE<br>Terminal 2</strong></div>
+              <div class="plane">➜</div>
+              <div class="airport"><small>To</small><strong>維也納 VIE<br>Terminal 3</strong></div>
+            </div>
+            <div class="flight-compact">
+              <div class="flight-row">
+                <div><span class="label">去程</span></div>
+                <div><div class="mini-title">航班</div><div class="time">BR65</div></div>
+                <div><div class="mini-title">出發</div><div class="time">08/16 23:55</div><div class="note">TPE → VIE</div></div>
+                <div><div class="mini-title">抵達</div><div class="time">08/17 06:55</div><div class="note">約 13:00</div></div>
+              </div>
+              <div class="flight-row">
+                <div><span class="label">回程</span></div>
+                <div><div class="mini-title">航班</div><div class="time">BR62</div></div>
+                <div><div class="mini-title">出發</div><div class="time">08/26 16:00</div><div class="note">VIE → TPE</div></div>
+                <div><div class="mini-title">抵達</div><div class="time">08/27 13:25</div><div class="note">經停 1 次</div></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card card-pad">
+            <div class="hotel-grid">
+              <article class="hotel">
+                <div class="city">Salzburg｜08/17–08/20</div>
+                <h3>Levy’s Salzburg</h3>
+                <dl>
+                  <dt>晚數</dt><dd>3 晚</dd>
+                  <dt>房型</dt><dd>Medium</dd>
+                  <dt>地址</dt><dd>Kaiserschützenstraße 6, 5020 Salzburg</dd>
+                </dl>
+              </article>
+              <article class="hotel">
+                <div class="city">Vienna｜08/20–08/26</div>
+                <h3>Adina Serviced Apartments Vienna</h3>
+                <dl>
+                  <dt>晚數</dt><dd>6 晚</dd>
+                  <dt>房型</dt><dd>Family Studio，附簡易廚房</dd>
+                  <dt>地址</dt><dd>Karl-Popper-Straße 6, Vienna</dd>
+                </dl>
+              </article>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="itinerary">
+        <div class="section-head">
+          <div>
+            <h2>每日行程</h2>
+            <p>改成緊湊卡片式；用側欄與篩選降低視覺負擔。</p>
+          </div>
+        </div>
+
+        <div class="tabs" role="tablist" aria-label="itinerary filters">
+          <button class="tab-btn active" data-filter="all">全部</button>
+          <button class="tab-btn" data-filter="salzburg">薩爾斯堡</button>
+          <button class="tab-btn" data-filter="vienna">維也納</button>
+          <button class="tab-btn" data-filter="amee">AMEE</button>
+          <button class="tab-btn" data-filter="nature">親子／自然</button>
+        </div>
+
+        <div class="itinerary">
+          <article class="day" id="d0816" data-tags="flight salzburg">
+            <div class="datebox"><div class="md">08/16</div><div class="weekday">Sun</div></div>
+            <div class="day-main">
+              <h3>台灣出發</h3>
+              <div class="badges"><span class="badge blue">飛行日</span><span class="badge">TPE → VIE</span></div>
+              <div class="plans">
+                <div class="plan"><strong>上午／白天</strong><p>行前準備：護照、票券、會議資料、親子用品。</p></div>
+                <div class="plan"><strong>晚上</strong><p>23:55 自台北桃園出發，搭乘長榮航空前往維也納。</p></div>
+              </div>
+            </div>
+          </article>
+
+          <article class="day" id="d0817" data-tags="salzburg nature">
+            <div class="datebox"><div class="md">08/17</div><div class="weekday">Mon</div></div>
+            <div class="day-main">
+              <h3>抵達維也納，前往薩爾斯堡</h3>
+              <div class="badges"><span class="badge">薩爾斯堡</span><span class="badge gold">老城初探</span></div>
+              <div class="plans">
+                <div class="plan"><strong>上午</strong><p>06:55 抵達維也納，轉搭 Railjet／ÖBB 前往薩爾斯堡；飯店寄放行李。</p></div>
+                <div class="plan"><strong>下午</strong><p>老城區漫步，米拉貝爾花園與《真善美》場景；低強度適應時差。</p></div>
+              </div>
+            </div>
+          </article>
+
+          <article class="day" id="d0818" data-tags="salzburg nature">
+            <div class="datebox"><div class="md">08/18</div><div class="weekday">Tue</div></div>
+            <div class="day-main">
+              <h3>國王湖 Königssee</h3>
+              <div class="badges"><span class="badge">自然景觀</span><span class="badge gold">親子健行</span></div>
+              <div class="plans">
+                <div class="plan"><strong>上午</strong><p>前往國王湖，搭船體驗湖面回聲與聖巴多羅買教堂景觀。</p></div>
+                <div class="plan"><strong>下午</strong><p>視體力延伸至 Obersee，森林輕健行與湖畔休息。</p></div>
+              </div>
+            </div>
+          </article>
+
+          <article class="day" id="d0819" data-tags="salzburg nature">
+            <div class="datebox"><div class="md">08/19</div><div class="weekday">Wed</div></div>
+            <div class="day-main">
+              <h3>貝希特斯加登鹽礦與薩爾斯堡高堡</h3>
+              <div class="badges"><span class="badge gold">地底探險</span><span class="badge">城市地標</span></div>
+              <div class="plans">
+                <div class="plan"><strong>上午</strong><p>貝希特斯加登鹽礦：礦坑滑梯、地下湖與鹽礦歷史。</p></div>
+                <div class="plan"><strong>下午</strong><p>薩爾斯堡高堡要塞；回老城採買莫札特巧克力與伴手禮。</p></div>
+              </div>
+            </div>
+          </article>
+
+          <article class="day" id="d0820" data-tags="salzburg vienna nature">
+            <div class="datebox"><div class="md">08/20</div><div class="weekday">Thu</div></div>
+            <div class="day-main">
+              <h3>海爾布倫宮，移動至維也納</h3>
+              <div class="badges"><span class="badge gold">惡作劇噴泉</span><span class="badge blue">Railjet</span></div>
+              <div class="plans">
+                <div class="plan"><strong>上午</strong><p>海爾布倫宮與惡作劇噴泉，作為薩爾斯堡段輕鬆收尾。</p></div>
+                <div class="plan"><strong>下午</strong><p>搭乘 Railjet 前往維也納，入住公寓式住宿，整理行李與補給。</p></div>
+              </div>
+            </div>
+          </article>
+
+          <article class="day" id="d0821" data-tags="vienna amee professional">
+            <div class="datebox"><div class="md">08/21</div><div class="weekday">Fri</div></div>
+            <div class="day-main">
+              <h3>維也納大學參訪與醫學博物館</h3>
+              <div class="badges"><span class="badge blue">醫學教育</span><span class="badge">維也納</span></div>
+              <div class="plans">
+                <div class="plan"><strong>上午</strong><p>維也納大學參訪與醫學教育交流；保留交通與會面緩衝。</p></div>
+                <div class="plan"><strong>下午</strong><p>Josephinum 醫學臘像收藏，或改走瘋子塔病理與醫學史路線。</p></div>
+              </div>
+            </div>
+          </article>
+
+          <article class="day" id="d0822" data-tags="vienna nature">
+            <div class="datebox"><div class="md">08/22</div><div class="weekday">Sat</div></div>
+            <div class="day-main">
+              <h3>熊布朗宮與動物園</h3>
+              <div class="badges"><span class="badge">世界遺產</span><span class="badge gold">親子友善</span></div>
+              <div class="plans">
+                <div class="plan"><strong>上午</strong><p>熊布朗宮 Grand Tour，欣賞哈布斯堡王朝宮廷空間。</p></div>
+                <div class="plan"><strong>下午</strong><p>熊布朗動物園，安排孩子放電；大人也順便充電。</p></div>
+              </div>
+            </div>
+          </article>
+
+          <article class="day" id="d0823" data-tags="vienna nature">
+            <div class="datebox"><div class="md">08/23</div><div class="weekday">Sun</div></div>
+            <div class="day-main">
+              <h3>藝術史博物館、國家圖書館與音響博物館</h3>
+              <div class="badges"><span class="badge">藝術文化</span><span class="badge gold">互動體驗</span></div>
+              <div class="plans">
+                <div class="plan"><strong>上午</strong><p>藝術史博物館與奧地利國家圖書館，主打經典文化與建築空間。</p></div>
+                <div class="plan"><strong>下午</strong><p>Haus der Musik 音響博物館，安排互動指揮體驗。</p></div>
+              </div>
+            </div>
+          </article>
+
+          <article class="day" id="d0824" data-tags="vienna amee nature">
+            <div class="datebox"><div class="md">08/24</div><div class="weekday">Mon</div></div>
+            <div class="day-main">
+              <h3>AMEE 全日會議</h3>
+              <div class="badges"><span class="badge blue">AMEE</span><span class="badge rose">分流行程</span></div>
+              <div class="plans">
+                <div class="plan"><strong>上午／下午</strong><p>AMEE 會議全日參與；優先鎖定 CBME、assessment、clinical reasoning、faculty development。</p></div>
+                <div class="plan"><strong>親子分流</strong><p>普拉特遊樂園與摩天輪；會議結束後視體力會合晚餐。</p></div>
+              </div>
+            </div>
+          </article>
+
+          <article class="day" id="d0825" data-tags="vienna nature">
+            <div class="datebox"><div class="md">08/25</div><div class="weekday">Tue</div></div>
+            <div class="day-main">
+              <h3>瓦豪河谷一日遊</h3>
+              <div class="badges"><span class="badge">梅爾克修道院</span><span class="badge gold">多瑙河遊船</span></div>
+              <div class="plans">
+                <div class="plan"><strong>上午</strong><p>梅爾克修道院：巴洛克建築、圖書館與修道院景觀。</p></div>
+                <div class="plan"><strong>下午</strong><p>多瑙河遊船，杜倫施坦小鎮散步；依船班調整停留長度。</p></div>
+              </div>
+            </div>
+          </article>
+
+          <article class="day" id="d0826" data-tags="vienna amee flight">
+            <div class="datebox"><div class="md">08/26</div><div class="weekday">Wed</div></div>
+            <div class="day-main">
+              <h3>AMEE 上午場與返程準備</h3>
+              <div class="badges"><span class="badge blue">AMEE</span><span class="badge">返程</span></div>
+              <div class="plans">
+                <div class="plan"><strong>上午</strong><p>AMEE 上午場；若不參加，可改排貝維德雷宮欣賞克林姆《吻》。</p></div>
+                <div class="plan"><strong>下午</strong><p>整理行李、前往機場，16:00 自維也納出發返台。</p></div>
+              </div>
+            </div>
+          </article>
+
+          <article class="day" id="d0827" data-tags="flight">
+            <div class="datebox"><div class="md">08/27</div><div class="weekday">Thu</div></div>
+            <div class="day-main">
+              <h3>抵達台灣</h3>
+              <div class="badges"><span class="badge blue">返抵 TPE</span></div>
+              <div class="plans">
+                <div class="plan"><strong>下午</strong><p>13:25 抵達台北桃園，回到台灣。</p></div>
+                <div class="plan"><strong>緩衝</strong><p>建議預留隔日休息，避免時差直接接上滿診。人生不是連續值班表。</p></div>
+              </div>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="section" id="packing">
+        <div class="section-head">
+          <div>
+            <h2>旅行必帶用品清單</h2>
+            <p>已精簡重複項目：信用卡只保留在「金錢與支付」，濕紙巾只保留在「親子用品」。</p>
+          </div>
+        </div>
+
+        <div class="checklist-grid">
+          <article class="check-card">
+            <h3>🪪 證件與文件</h3>
+            <label><input type="checkbox"> 護照</label>
+            <label><input type="checkbox"> 機票</label>
+            <label><input type="checkbox"> 住宿資料</label>
+            <label><input type="checkbox"> AMEE 會議註冊資料</label>
+            <label><input type="checkbox"> 重要文件備份</label>
+          </article>
+
+          <article class="check-card">
+            <h3>💳 金錢與支付</h3>
+            <label><input type="checkbox"> 信用卡</label>
+            <label><input type="checkbox"> 少量歐元現金</label>
+            <label><input type="checkbox"> 悠遊卡</label>
+          </article>
+
+          <article class="check-card">
+            <h3>📱 電子設備</h3>
+            <label><input type="checkbox"> 手機</label>
+            <label><input type="checkbox"> 充電器</label>
+            <label><input type="checkbox"> 行動電源</label>
+            <label><input type="checkbox"> 歐規轉接頭</label>
+            <label><input type="checkbox"> 相機</label>
+            <label><input type="checkbox"> 耳機</label>
+            <label><input type="checkbox"> 筆電或平板</label>
+          </article>
+
+          <article class="check-card">
+            <h3>👕 衣物與穿著</h3>
+            <label><input type="checkbox"> 舒適步行鞋</label>
+            <label><input type="checkbox"> 薄外套</label>
+            <label><input type="checkbox"> 正式／半正式會議服裝</label>
+            <label><input type="checkbox"> 雨具</label>
+            <label><input type="checkbox"> 睡衣</label>
+            <label><input type="checkbox"> 換洗衣物</label>
+          </article>
+
+          <article class="check-card">
+            <h3>💊 藥品與健康用品</h3>
+            <label><input type="checkbox"> 個人常用藥</label>
+            <label><input type="checkbox"> 退燒止痛藥</label>
+            <label><input type="checkbox"> 腸胃藥</label>
+            <label><input type="checkbox"> 暈車藥</label>
+            <label><input type="checkbox"> OK 繃</label>
+            <label><input type="checkbox"> 防曬</label>
+            <label><input type="checkbox"> 口罩</label>
+            <label><input type="checkbox"> 乾洗手</label>
+          </article>
+
+          <article class="check-card">
+            <h3>🧒 親子用品</h3>
+            <label><input type="checkbox"> 孩子衣物</label>
+            <label><input type="checkbox"> 輕便零食</label>
+            <label><input type="checkbox"> 水壺</label>
+            <label><input type="checkbox"> 小玩具或書</label>
+            <label><input type="checkbox"> 濕紙巾</label>
+            <label><input type="checkbox"> 兒童常用藥</label>
+            <label><input type="checkbox"> 長途飛行安撫用品</label>
+          </article>
+
+          <article class="check-card">
+            <h3>🎒 每日隨身包</h3>
+            <label><input type="checkbox"> 護照影本</label>
+            <label><input type="checkbox"> 現金</label>
+            <label><input type="checkbox"> 交通票券</label>
+          </article>
+
+          <article class="check-card">
+            <h3>📚 AMEE 會議用品</h3>
+            <label><input type="checkbox"> 名片</label>
+            <label><input type="checkbox"> 筆記工具</label>
+            <label><input type="checkbox"> 交流資料</label>
+            <label><input type="checkbox"> 可快速自我介紹的研究重點摘要</label>
+          </article>
+
+          <article class="check-card">
+            <h3>🧺 其他生活用品</h3>
+            <label><input type="checkbox"> 旅行洗衣袋</label>
+            <label><input type="checkbox"> 摺疊購物袋</label>
+            <label><input type="checkbox"> 夾鏈袋</label>
+            <label><input type="checkbox"> 小剪刀或指甲剪</label>
+            <label><input type="checkbox"> 旅行用盥洗包</label>
+            <label><input type="checkbox"> 備用眼鏡</label>
+          </article>
+        </div>
+      </section>
+
+      <section class="section" id="tips">
+        <div class="section-head">
+          <div>
+            <h2>行程提醒</h2>
+            <p>把容易漏掉的事情集中在最後。</p>
+          </div>
+        </div>
+        <div class="tips">
+          <article class="tip">
+            <div class="tip-icon">🎫</div>
+            <h3>先訂必要票券</h3>
+            <p>國王湖船班、鹽礦、熊布朗宮、瓦豪河谷船班與 Railjet 建議提前確認。</p>
+          </article>
+          <article class="tip">
+            <div class="tip-icon">🧒</div>
+            <h3>親子節奏留白</h3>
+            <p>每 2–3 天保留低強度下午或晚上，避免孩子與大人同步進入系統過載。</p>
+          </article>
+          <article class="tip">
+            <div class="tip-icon">📚</div>
+            <h3>AMEE 場次策略</h3>
+            <p>不必全程參加；以主題優先，避開連續高密度場次，品質比打卡數重要。</p>
+          </article>
+        </div>
+      </section>
+
+      <div class="privacy">本頁已移除旅客姓名、Email、訂位代碼、座位、會員號碼與信用卡資訊；僅保留行程展示所需內容。</div>
+    </main>
+  </div>
+
+  <div class="print-toast" id="printToast">正在開啟列印視窗。若瀏覽器沒有反應，請直接按 <strong>Ctrl + P</strong>，再選擇「另存為 PDF」。</div>
+
+  <script>
+    function showPrintToast() {
+      const toast = document.getElementById('printToast');
+      if (!toast) return;
+      toast.classList.add('show');
+      window.setTimeout(() => toast.classList.remove('show'), 4200);
+    }
+
+    function printPage() {
+      showPrintToast();
+      window.setTimeout(() => {
+        try {
+          window.focus();
+          window.print();
+        } catch (error) {
+          showPrintToast();
+        }
+      }, 120);
+    }
+
+    const printBtn = document.getElementById('printBtn');
+    if (printBtn) {
+      printBtn.addEventListener('click', printPage);
+    }
+
+    const buttons = document.querySelectorAll('.tab-btn');
+    const days = document.querySelectorAll('.day');
+
+    buttons.forEach(button => {
+      button.addEventListener('click', () => {
+        const filter = button.dataset.filter;
+        buttons.forEach(b => b.classList.remove('active'));
+        button.classList.add('active');
+
+        days.forEach(day => {
+          const tags = day.dataset.tags || '';
+          const show = filter === 'all' || tags.includes(filter);
+          day.style.display = show ? 'grid' : 'none';
+        });
+      });
+    });
+  </script>
+</body>
+</html>
