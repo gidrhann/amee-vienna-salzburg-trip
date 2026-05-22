@@ -1791,6 +1791,10 @@
     const STORAGE_KEY = 'amee_trip_v1';
     let saveTimer;
 
+    // 在 loadSaved() 執行前先記住原始 HTML，
+    // 讓「還原」可以直接回到這個狀態，不需要 location.reload()
+    const ORIGINAL_LAYOUT_HTML = document.querySelector('.layout').innerHTML;
+
     document.addEventListener('input', () => {
       clearTimeout(saveTimer);
       setStatus('儲存中…');
@@ -1838,10 +1842,24 @@
     loadSaved();
 
     function clearStorage() {
-      if (confirm('確定要還原所有修改？頁面將重新載入。')) {
-        localStorage.removeItem(STORAGE_KEY);
-        location.reload();
-      }
+      if (!confirm('確定要還原所有修改？所有編輯將回到原始內容。')) return;
+
+      // 移除已儲存的內容
+      localStorage.removeItem(STORAGE_KEY);
+
+      // 直接還原原始 HTML（不需要 reload，避免 bfcache 造成狀態殘留）
+      document.querySelector('.layout').innerHTML = ORIGINAL_LAYOUT_HTML;
+
+      // 強制重設所有編輯狀態
+      editMode = false;
+      document.body.classList.remove('edit-mode');
+      document.querySelectorAll('[contenteditable]')
+        .forEach(el => el.removeAttribute('contenteditable'));
+      document.getElementById('editBar').classList.remove('show');
+      const editBtn = document.getElementById('editBtn');
+      if (editBtn) editBtn.removeAttribute('style');
+
+      setStatus('已還原原始內容');
     }
 
     // =========================================================
