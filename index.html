@@ -1028,6 +1028,70 @@
       .print-toast { display: none; }
     }
 
+    /* ===== 密碼鎖定 ===== */
+    .lock-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #2f7d58 0%, #496a8f 100%);
+    }
+    .lock-box {
+      background: #fff;
+      border-radius: 24px;
+      padding: 36px 32px 28px;
+      width: 320px;
+      text-align: center;
+      box-shadow: 0 32px 80px rgba(0,0,0,0.28);
+    }
+    .lock-icon { font-size: 52px; margin-bottom: 14px; }
+    .lock-box h2 { margin: 0 0 6px; font-size: 22px; letter-spacing: -0.03em; }
+    .lock-box p { color: #65726c; font-size: 14px; margin: 0 0 20px; }
+    .lock-input {
+      width: 100%;
+      padding: 12px 16px;
+      border: 2px solid #d8e3dc;
+      border-radius: 12px;
+      font-size: 16px;
+      outline: none;
+      transition: border 0.15s;
+      box-sizing: border-box;
+      margin-bottom: 10px;
+      font-family: inherit;
+    }
+    .lock-input:focus { border-color: #5aa47b; }
+    .lock-input.shake { animation: lockShake 0.4s ease; }
+    @keyframes lockShake {
+      0%,100% { transform: translateX(0); }
+      20% { transform: translateX(-8px); }
+      40% { transform: translateX(8px); }
+      60% { transform: translateX(-5px); }
+      80% { transform: translateX(5px); }
+    }
+    .lock-btn {
+      width: 100%;
+      padding: 12px;
+      background: #2f7d58;
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 900;
+      cursor: pointer;
+      transition: background 0.15s;
+      font-family: inherit;
+    }
+    .lock-btn:hover { background: #5aa47b; }
+    .lock-error {
+      color: #a95d68;
+      font-size: 13px;
+      margin-top: 10px;
+      display: none;
+    }
+    @media print { .lock-overlay { display: none !important; } }
+
     /* ===== Edit Mode ===== */
     body.edit-mode [contenteditable="true"] {
       outline: 2px dashed rgba(90,164,123,0.55);
@@ -1100,6 +1164,18 @@
   </style>
 </head>
 <body>
+  <!-- 密碼保護遮罩 -->
+  <div class="lock-overlay" id="lockOverlay">
+    <div class="lock-box">
+      <div class="lock-icon">🔒</div>
+      <h2>AMEE 2026 行程</h2>
+      <p>此頁面已設定密碼保護</p>
+      <input class="lock-input" type="password" id="passInput" placeholder="請輸入密碼" autocomplete="current-password">
+      <button class="lock-btn" id="passBtn">進入</button>
+      <div class="lock-error" id="passError">密碼錯誤，請再試一次</div>
+    </div>
+  </div>
+
   <div class="layout">
     <aside class="sidebar" aria-label="行程側邊欄">
       <div class="brand">
@@ -1535,6 +1611,47 @@
 
   <script>
     // =========================================================
+    // 密碼保護（SHA-256，hash 存 localStorage）
+    // =========================================================
+    const PASS_HASH = 'cdfb161520ce02d2a5c2c38683ce5a8aabd3753e021e96d6753c2e3b84091702';
+    const AUTH_KEY  = 'amee_auth_v1';
+
+    async function sha256(str) {
+      const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+      return Array.from(new Uint8Array(buf), b => b.toString(16).padStart(2,'0')).join('');
+    }
+
+    async function initAuth() {
+      const stored = localStorage.getItem(AUTH_KEY);
+      if (stored === PASS_HASH) { return; }           // 已驗證
+      document.getElementById('lockOverlay').style.display = 'flex';
+    }
+    initAuth();
+
+    async function submitPassword() {
+      const val = document.getElementById('passInput').value;
+      const h   = await sha256(val);
+      if (h === PASS_HASH) {
+        localStorage.setItem(AUTH_KEY, h);
+        const overlay = document.getElementById('lockOverlay');
+        overlay.style.transition = 'opacity 0.4s';
+        overlay.style.opacity = '0';
+        setTimeout(() => overlay.style.display = 'none', 400);
+      } else {
+        document.getElementById('passError').style.display = 'block';
+        const inp = document.getElementById('passInput');
+        inp.value = '';
+        inp.classList.add('shake');
+        setTimeout(() => inp.classList.remove('shake'), 450);
+      }
+    }
+
+    // 密碼 Enter / 按鈕（用 delegation，避免 DOM 替換問題）
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Enter' && document.activeElement?.id === 'passInput') submitPassword();
+    });
+
+    // =========================================================
     // 列印
     // =========================================================
     function showPrintToast() {
@@ -1550,25 +1667,20 @@
         catch (e) { showPrintToast(); }
       }, 120);
     }
-    document.getElementById('printBtn').addEventListener('click', printPage);
 
     // =========================================================
     // 行程篩選 Tab
     // =========================================================
-    function bindTabFilter() {
-      document.querySelectorAll('.tab-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const filter = btn.dataset.filter;
-          document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-          btn.classList.add('active');
-          document.querySelectorAll('.day').forEach(day => {
-            const tags = day.dataset.tags || '';
-            day.style.display = (filter === 'all' || tags.includes(filter)) ? 'grid' : 'none';
-          });
-        });
+    function handleTabClick(btn) {
+      const filter = btn.dataset.filter;
+      if (!filter) return;
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      document.querySelectorAll('.day').forEach(day => {
+        const tags = day.dataset.tags || '';
+        day.style.display = (filter === 'all' || tags.includes(filter)) ? 'grid' : 'none';
       });
     }
-    bindTabFilter();
 
     // =========================================================
     // 編輯模式
@@ -1584,10 +1696,8 @@
       '.mini-day b', '.mini-day span',
       '.compact-list li span', '.compact-list li strong',
     ];
-
     let editMode = false;
 
-    // 把 checklist label 的純文字節點包成 <span class="check-text">
     function wrapCheckLabels() {
       document.querySelectorAll('.check-card label').forEach(label => {
         label.childNodes.forEach(node => {
@@ -1602,12 +1712,12 @@
     }
 
     function setEditables(on) {
-      EDITABLE_SEL.forEach(sel => {
+      EDITABLE_SEL.forEach(sel =>
         document.querySelectorAll(sel).forEach(el => {
           if (on) el.setAttribute('contenteditable', 'true');
           else el.removeAttribute('contenteditable');
-        });
-      });
+        })
+      );
     }
 
     function enterEdit() {
@@ -1616,7 +1726,8 @@
       document.body.classList.add('edit-mode');
       setEditables(true);
       document.getElementById('editBar').classList.add('show');
-      document.getElementById('editBtn').style.display = 'none';
+      const btn = document.getElementById('editBtn');
+      if (btn) btn.style.display = 'none';
       setStatus('點擊任何文字即可修改');
     }
 
@@ -1625,11 +1736,9 @@
       document.body.classList.remove('edit-mode');
       setEditables(false);
       document.getElementById('editBar').classList.remove('show');
-      document.getElementById('editBtn').style.display = '';
+      const btn = document.getElementById('editBtn');
+      if (btn) btn.style.display = '';
     }
-
-    document.getElementById('editBtn').addEventListener('click', enterEdit);
-    document.getElementById('exitEditBtn').addEventListener('click', exitEdit);
 
     // =========================================================
     // 自動儲存（localStorage）
@@ -1644,9 +1753,7 @@
         try {
           localStorage.setItem(STORAGE_KEY, document.querySelector('.layout').innerHTML);
           setStatus('✓ 已自動儲存');
-        } catch(e) {
-          setStatus('⚠️ 儲存失敗');
-        }
+        } catch(e) { setStatus('⚠️ 儲存失敗'); }
       }, 800);
     });
 
@@ -1659,39 +1766,37 @@
       const saved = localStorage.getItem(STORAGE_KEY);
       if (!saved) return;
       document.querySelector('.layout').innerHTML = saved;
-      bindTabFilter();
+      // 注意：.layout 替換後，內部按鈕的 DOM 元素改變，
+      // 但所有事件由 document delegation 處理，不受影響。
     }
     loadSaved();
 
-    document.getElementById('clearBtn').addEventListener('click', () => {
+    function clearStorage() {
       if (confirm('確定要還原所有修改？頁面將重新載入。')) {
         localStorage.removeItem(STORAGE_KEY);
         location.reload();
       }
-    });
+    }
 
     // =========================================================
     // 推送到 GitHub（GitHub Contents API）
     // =========================================================
-    const GH_OWNER = 'gidrhann';
-    const GH_REPO  = 'amee-vienna-salzburg-trip';
-    const GH_FILE  = 'index.html';
+    const GH_OWNER  = 'gidrhann';
+    const GH_REPO   = 'amee-vienna-salzburg-trip';
+    const GH_FILE   = 'index.html';
     const TOKEN_KEY = 'gh_pat_amee';
 
-    document.getElementById('clearTokenBtn').addEventListener('click', () => {
+    function clearToken() {
       localStorage.removeItem(TOKEN_KEY);
       setStatus('Token 已清除');
-    });
-
-    document.getElementById('pushBtn').addEventListener('click', pushToGitHub);
+    }
 
     async function pushToGitHub() {
       let token = localStorage.getItem(TOKEN_KEY);
       if (!token) {
         token = prompt(
           '請輸入 GitHub Personal Access Token\n' +
-          '（classic token 需有 repo 權限；\n' +
-          ' fine-grained token 需有 Contents 寫入權限）\n\n' +
+          '（classic token 需有 repo 權限）\n\n' +
           '⚠️ Token 僅存在你瀏覽器的 localStorage，不會傳給第三方。'
         );
         if (!token) return;
@@ -1699,73 +1804,63 @@
         localStorage.setItem(TOKEN_KEY, token);
       }
 
-      // 暫時移除 contenteditable，取得乾淨的 HTML
+      // 暫時移除 contenteditable，取得乾淨 HTML
       setEditables(false);
       document.body.classList.remove('edit-mode');
       document.getElementById('editBar').classList.remove('show');
-
       const html = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
-
-      // 恢復編輯狀態
+      // 恢復
       document.body.classList.add('edit-mode');
       document.getElementById('editBar').classList.add('show');
       setEditables(true);
 
       setStatus('🔄 推送中…');
-
       try {
         const headers = {
           Authorization: `token ${token}`,
           Accept: 'application/vnd.github.v3+json',
           'Content-Type': 'application/json',
         };
-
-        // 取得目前檔案的 SHA（更新必要）
         const getRes = await fetch(
           `https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${GH_FILE}`,
           { headers }
         );
-        if (!getRes.ok) {
-          const err = await getRes.json();
-          throw new Error(err.message || `HTTP ${getRes.status}`);
-        }
+        if (!getRes.ok) { const e = await getRes.json(); throw new Error(e.message || getRes.status); }
         const { sha } = await getRes.json();
 
-        // UTF-8 → Base64（支援中文）
-        const bytes = new TextEncoder().encode(html);
+        const bytes  = new TextEncoder().encode(html);
         const binStr = Array.from(bytes, b => String.fromCodePoint(b)).join('');
         const content = btoa(binStr);
 
-        // 推送
         const putRes = await fetch(
           `https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${GH_FILE}`,
-          {
-            method: 'PUT',
-            headers,
-            body: JSON.stringify({
-              message: '✏️ 更新行程內容（網頁直接編輯）',
-              content,
-              sha,
-            }),
-          }
+          { method: 'PUT', headers, body: JSON.stringify({ message: '✏️ 更新行程內容（網頁直接編輯）', content, sha }) }
         );
-
         if (putRes.ok) {
           setStatus('✅ 推送成功！約 1 分鐘後更新');
         } else {
-          const err = await putRes.json();
-          if (err.message?.includes('Bad credentials')) {
-            localStorage.removeItem(TOKEN_KEY);
-            setStatus('❌ Token 無效，已清除，請重試');
-          } else {
-            throw new Error(err.message || `HTTP ${putRes.status}`);
-          }
+          const e = await putRes.json();
+          if (e.message?.includes('Bad credentials')) { localStorage.removeItem(TOKEN_KEY); setStatus('❌ Token 無效，已清除'); }
+          else throw new Error(e.message || putRes.status);
         }
-      } catch(e) {
-        setStatus('❌ ' + e.message);
-        console.error(e);
-      }
+      } catch(e) { setStatus('❌ ' + e.message); console.error(e); }
     }
+
+    // =========================================================
+    // 事件委派（解決 localStorage 替換 DOM 後事件丟失問題）
+    // 所有按鈕事件統一在 document 層級處理
+    // =========================================================
+    document.addEventListener('click', e => {
+      const id = e.target.id;
+      if (id === 'passBtn')       { submitPassword(); return; }
+      if (id === 'editBtn')       { enterEdit();      return; }
+      if (id === 'exitEditBtn')   { exitEdit();       return; }
+      if (id === 'clearBtn')      { clearStorage();   return; }
+      if (id === 'clearTokenBtn') { clearToken();     return; }
+      if (id === 'pushBtn')       { pushToGitHub();   return; }
+      if (id === 'printBtn')      { printPage();      return; }
+      if (e.target.classList.contains('tab-btn')) { handleTabClick(e.target); return; }
+    });
   </script>
 </body>
 </html>
