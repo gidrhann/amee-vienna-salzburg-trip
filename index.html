@@ -1751,7 +1751,20 @@
       setStatus('儲存中…');
       saveTimer = setTimeout(() => {
         try {
+          // 儲存前暫時移除所有 contenteditable 與 editBtn hidden 狀態，
+          // 避免下次載入時卡在編輯模式
+          const editBtn = document.getElementById('editBtn');
+          const editBtnHidden = editBtn?.style.display === 'none';
+          if (editBtn && editBtnHidden) editBtn.style.display = '';
+          document.querySelectorAll('[contenteditable]')
+            .forEach(el => el.removeAttribute('contenteditable'));
+
           localStorage.setItem(STORAGE_KEY, document.querySelector('.layout').innerHTML);
+
+          // 還原
+          if (editBtn && editBtnHidden) editBtn.style.display = 'none';
+          if (editMode) setEditables(true);
+
           setStatus('✓ 已自動儲存');
         } catch(e) { setStatus('⚠️ 儲存失敗'); }
       }, 800);
@@ -1766,8 +1779,16 @@
       const saved = localStorage.getItem(STORAGE_KEY);
       if (!saved) return;
       document.querySelector('.layout').innerHTML = saved;
-      // 注意：.layout 替換後，內部按鈕的 DOM 元素改變，
-      // 但所有事件由 document delegation 處理，不受影響。
+
+      // 修正：localStorage 可能存了「編輯模式中」的狀態
+      // （editBtn hidden、contenteditable 屬性殘留）
+      // 強制重設回乾淨的非編輯狀態
+      editMode = false;
+      document.body.classList.remove('edit-mode');
+      document.querySelectorAll('[contenteditable]')
+        .forEach(el => el.removeAttribute('contenteditable'));
+      const editBtn = document.getElementById('editBtn');
+      if (editBtn) editBtn.style.display = '';
     }
     loadSaved();
 
