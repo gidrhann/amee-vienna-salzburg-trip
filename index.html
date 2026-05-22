@@ -46,6 +46,11 @@
       display: grid;
       grid-template-columns: var(--sidebar) minmax(0, 1fr);
       min-height: 100vh;
+      transition: grid-template-columns 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .layout.sidebar-hidden {
+      grid-template-columns: 0px minmax(0, 1fr);
     }
 
     .sidebar {
@@ -56,8 +61,43 @@
       background: rgba(255, 255, 255, 0.86);
       border-right: 1px solid var(--line);
       backdrop-filter: blur(16px);
-      overflow-y: auto;
+      overflow: hidden;
+      transition: opacity 0.22s ease, padding 0.28s cubic-bezier(0.4, 0, 0.2, 1);
     }
+
+    .sidebar-scroll {
+      width: var(--sidebar);
+      overflow-y: auto;
+      height: 100%;
+      padding-right: 2px;
+    }
+
+    .layout.sidebar-hidden .sidebar {
+      opacity: 0;
+      padding: 0;
+      pointer-events: none;
+      border-right: 0;
+    }
+
+    .sidebar-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #fff;
+      color: var(--ink);
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(31,41,51,0.06);
+      font-size: 16px;
+      transition: background 0.15s, transform 0.25s;
+      flex-shrink: 0;
+    }
+    .sidebar-toggle:hover { background: var(--green-soft); color: var(--green-dark); }
+    .layout.sidebar-hidden .sidebar-toggle-icon { transform: scaleX(-1); }
+    @media print { .sidebar-toggle { display: none; } }
 
     .brand {
       padding: 18px;
@@ -1178,6 +1218,7 @@
 
   <div class="layout">
     <aside class="sidebar" aria-label="行程側邊欄">
+      <div class="sidebar-scroll">
       <div class="brand">
         <div class="kicker">AMEE 2026 · Austria</div>
         <h1>奧地利親子 × 醫學教育行程</h1>
@@ -1222,13 +1263,18 @@
           <a class="mini-day" href="#d0827"><b>08/27</b><span>抵達台灣</span></a>
         </div>
       </div>
+      </div><!-- /.sidebar-scroll -->
     </aside>
 
     <main class="main">
       <div class="topbar">
-        <strong>2026 Austria Itinerary</strong>
+        <div style="display:flex;align-items:center;gap:10px;min-width:0;">
+          <button class="sidebar-toggle" id="sidebarToggleBtn" title="收合／展開側欄" aria-label="切換側欄">
+            <span class="sidebar-toggle-icon">☰</span>
+          </button>
+          <strong style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">2026 Austria Itinerary</strong>
+        </div>
         <div class="topbar-actions">
-          <button class="button" onclick="document.querySelector('.sidebar').scrollIntoView({behavior:'smooth'})">側欄</button>
           <button class="button" type="button" id="editBtn">✏️ 編輯</button>
           <button class="button primary" type="button" id="printBtn">列印 / 存成 PDF</button>
         </div>
@@ -1868,18 +1914,37 @@
     }
 
     // =========================================================
+    // Sidebar 收合
+    // =========================================================
+    const SIDEBAR_KEY = 'amee_sidebar_v1';
+
+    function toggleSidebar() {
+      const layout = document.querySelector('.layout');
+      const isHidden = layout.classList.toggle('sidebar-hidden');
+      localStorage.setItem(SIDEBAR_KEY, isHidden ? '1' : '0');
+    }
+
+    function initSidebar() {
+      if (localStorage.getItem(SIDEBAR_KEY) === '1') {
+        document.querySelector('.layout').classList.add('sidebar-hidden');
+      }
+    }
+    initSidebar();
+
+    // =========================================================
     // 事件委派（解決 localStorage 替換 DOM 後事件丟失問題）
     // 所有按鈕事件統一在 document 層級處理
     // =========================================================
     document.addEventListener('click', e => {
-      const id = e.target.id;
-      if (id === 'passBtn')       { submitPassword(); return; }
-      if (id === 'editBtn')       { enterEdit();      return; }
-      if (id === 'exitEditBtn')   { exitEdit();       return; }
-      if (id === 'clearBtn')      { clearStorage();   return; }
-      if (id === 'clearTokenBtn') { clearToken();     return; }
-      if (id === 'pushBtn')       { pushToGitHub();   return; }
-      if (id === 'printBtn')      { printPage();      return; }
+      const id = e.target.id || e.target.closest('[id]')?.id;
+      if (id === 'passBtn')          { submitPassword(); return; }
+      if (id === 'sidebarToggleBtn') { toggleSidebar();  return; }
+      if (id === 'editBtn')          { enterEdit();      return; }
+      if (id === 'exitEditBtn')      { exitEdit();       return; }
+      if (id === 'clearBtn')         { clearStorage();   return; }
+      if (id === 'clearTokenBtn')    { clearToken();     return; }
+      if (id === 'pushBtn')          { pushToGitHub();   return; }
+      if (id === 'printBtn')         { printPage();      return; }
       if (e.target.classList.contains('tab-btn')) { handleTabClick(e.target); return; }
     });
   </script>
