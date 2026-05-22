@@ -1027,6 +1027,76 @@
     @media print {
       .print-toast { display: none; }
     }
+
+    /* ===== Edit Mode ===== */
+    body.edit-mode [contenteditable="true"] {
+      outline: 2px dashed rgba(90,164,123,0.55);
+      border-radius: 4px;
+      cursor: text;
+      min-height: 1em;
+      transition: outline 0.15s, background 0.15s;
+    }
+    body.edit-mode [contenteditable="true"]:hover {
+      outline-color: var(--green);
+      background: rgba(90,164,123,0.06);
+    }
+    body.edit-mode [contenteditable="true"]:focus {
+      outline: 2px solid var(--green-dark);
+      outline-offset: 1px;
+      background: rgba(90,164,123,0.09);
+    }
+
+    .edit-bar {
+      display: none;
+      position: fixed;
+      bottom: 22px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 1000;
+      align-items: center;
+      gap: 8px;
+      background: rgba(20,30,25,0.95);
+      color: #fff;
+      border-radius: 18px;
+      padding: 10px 14px;
+      box-shadow: 0 18px 48px rgba(0,0,0,0.30);
+      font-size: 13px;
+      white-space: nowrap;
+      backdrop-filter: blur(10px);
+    }
+    .edit-bar.show { display: flex; }
+    .edit-bar .eb-btn {
+      border: 1px solid rgba(255,255,255,0.22);
+      border-radius: 999px;
+      background: rgba(255,255,255,0.10);
+      color: #fff;
+      padding: 7px 13px;
+      font-size: 13px;
+      font-weight: 900;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .edit-bar .eb-btn:hover { background: rgba(255,255,255,0.20); }
+    .edit-bar .eb-btn.primary {
+      background: var(--green-dark);
+      border-color: var(--green-dark);
+    }
+    .edit-bar .eb-btn.primary:hover { background: var(--green); }
+    .eb-status {
+      font-size: 12px;
+      opacity: 0.68;
+      min-width: 80px;
+      text-align: center;
+    }
+    .edit-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 12px;
+      font-weight: 900;
+      opacity: 0.9;
+    }
+    @media print { .edit-bar { display: none !important; } }
   </style>
 </head>
 <body>
@@ -1083,6 +1153,7 @@
         <strong>2026 Austria Itinerary</strong>
         <div class="topbar-actions">
           <button class="button" onclick="document.querySelector('.sidebar').scrollIntoView({behavior:'smooth'})">側欄</button>
+          <button class="button" type="button" id="editBtn">✏️ 編輯</button>
           <button class="button primary" type="button" id="printBtn">列印 / 存成 PDF</button>
         </div>
       </div>
@@ -1452,47 +1523,249 @@
 
   <div class="print-toast" id="printToast">正在開啟列印視窗。若瀏覽器沒有反應，請直接按 <strong>Ctrl + P</strong>，再選擇「另存為 PDF」。</div>
 
+  <!-- 編輯模式浮動工具列 -->
+  <div class="edit-bar" id="editBar">
+    <span class="edit-badge">✏️ 編輯模式</span>
+    <span class="eb-status" id="ebStatus">點擊文字即可修改</span>
+    <button class="eb-btn" id="clearBtn" title="還原所有修改">↩ 還原</button>
+    <button class="eb-btn" id="clearTokenBtn" title="重設 GitHub Token">🔑 換 Token</button>
+    <button class="eb-btn" id="pushBtn">🚀 推送到 GitHub</button>
+    <button class="eb-btn primary" id="exitEditBtn">完成</button>
+  </div>
+
   <script>
+    // =========================================================
+    // 列印
+    // =========================================================
     function showPrintToast() {
       const toast = document.getElementById('printToast');
       if (!toast) return;
       toast.classList.add('show');
       window.setTimeout(() => toast.classList.remove('show'), 4200);
     }
-
     function printPage() {
       showPrintToast();
       window.setTimeout(() => {
-        try {
-          window.focus();
-          window.print();
-        } catch (error) {
-          showPrintToast();
-        }
+        try { window.focus(); window.print(); }
+        catch (e) { showPrintToast(); }
       }, 120);
     }
+    document.getElementById('printBtn').addEventListener('click', printPage);
 
-    const printBtn = document.getElementById('printBtn');
-    if (printBtn) {
-      printBtn.addEventListener('click', printPage);
-    }
-
-    const buttons = document.querySelectorAll('.tab-btn');
-    const days = document.querySelectorAll('.day');
-
-    buttons.forEach(button => {
-      button.addEventListener('click', () => {
-        const filter = button.dataset.filter;
-        buttons.forEach(b => b.classList.remove('active'));
-        button.classList.add('active');
-
-        days.forEach(day => {
-          const tags = day.dataset.tags || '';
-          const show = filter === 'all' || tags.includes(filter);
-          day.style.display = show ? 'grid' : 'none';
+    // =========================================================
+    // 行程篩選 Tab
+    // =========================================================
+    function bindTabFilter() {
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const filter = btn.dataset.filter;
+          document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          document.querySelectorAll('.day').forEach(day => {
+            const tags = day.dataset.tags || '';
+            day.style.display = (filter === 'all' || tags.includes(filter)) ? 'grid' : 'none';
+          });
         });
       });
+    }
+    bindTabFilter();
+
+    // =========================================================
+    // 編輯模式
+    // =========================================================
+    const EDITABLE_SEL = [
+      '.brand h1', '.brand > p',
+      '.hero-card h2', '.hero-card > p',
+      '.day-main h3', '.badge',
+      '.plan strong', '.plan p',
+      '.hotel .city', '.hotel h3', '.hotel dd',
+      '.tip h3', '.tip > p',
+      '.check-card h3', '.check-text',
+      '.mini-day b', '.mini-day span',
+      '.compact-list li span', '.compact-list li strong',
+    ];
+
+    let editMode = false;
+
+    // 把 checklist label 的純文字節點包成 <span class="check-text">
+    function wrapCheckLabels() {
+      document.querySelectorAll('.check-card label').forEach(label => {
+        label.childNodes.forEach(node => {
+          if (node.nodeType === Node.TEXT_NODE && node.textContent.trim()) {
+            const span = document.createElement('span');
+            span.className = 'check-text';
+            span.textContent = node.textContent;
+            label.replaceChild(span, node);
+          }
+        });
+      });
+    }
+
+    function setEditables(on) {
+      EDITABLE_SEL.forEach(sel => {
+        document.querySelectorAll(sel).forEach(el => {
+          if (on) el.setAttribute('contenteditable', 'true');
+          else el.removeAttribute('contenteditable');
+        });
+      });
+    }
+
+    function enterEdit() {
+      wrapCheckLabels();
+      editMode = true;
+      document.body.classList.add('edit-mode');
+      setEditables(true);
+      document.getElementById('editBar').classList.add('show');
+      document.getElementById('editBtn').style.display = 'none';
+      setStatus('點擊任何文字即可修改');
+    }
+
+    function exitEdit() {
+      editMode = false;
+      document.body.classList.remove('edit-mode');
+      setEditables(false);
+      document.getElementById('editBar').classList.remove('show');
+      document.getElementById('editBtn').style.display = '';
+    }
+
+    document.getElementById('editBtn').addEventListener('click', enterEdit);
+    document.getElementById('exitEditBtn').addEventListener('click', exitEdit);
+
+    // =========================================================
+    // 自動儲存（localStorage）
+    // =========================================================
+    const STORAGE_KEY = 'amee_trip_v1';
+    let saveTimer;
+
+    document.addEventListener('input', () => {
+      clearTimeout(saveTimer);
+      setStatus('儲存中…');
+      saveTimer = setTimeout(() => {
+        try {
+          localStorage.setItem(STORAGE_KEY, document.querySelector('.layout').innerHTML);
+          setStatus('✓ 已自動儲存');
+        } catch(e) {
+          setStatus('⚠️ 儲存失敗');
+        }
+      }, 800);
     });
+
+    function setStatus(msg) {
+      const el = document.getElementById('ebStatus');
+      if (el) el.textContent = msg;
+    }
+
+    function loadSaved() {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (!saved) return;
+      document.querySelector('.layout').innerHTML = saved;
+      bindTabFilter();
+    }
+    loadSaved();
+
+    document.getElementById('clearBtn').addEventListener('click', () => {
+      if (confirm('確定要還原所有修改？頁面將重新載入。')) {
+        localStorage.removeItem(STORAGE_KEY);
+        location.reload();
+      }
+    });
+
+    // =========================================================
+    // 推送到 GitHub（GitHub Contents API）
+    // =========================================================
+    const GH_OWNER = 'gidrhann';
+    const GH_REPO  = 'amee-vienna-salzburg-trip';
+    const GH_FILE  = 'index.html';
+    const TOKEN_KEY = 'gh_pat_amee';
+
+    document.getElementById('clearTokenBtn').addEventListener('click', () => {
+      localStorage.removeItem(TOKEN_KEY);
+      setStatus('Token 已清除');
+    });
+
+    document.getElementById('pushBtn').addEventListener('click', pushToGitHub);
+
+    async function pushToGitHub() {
+      let token = localStorage.getItem(TOKEN_KEY);
+      if (!token) {
+        token = prompt(
+          '請輸入 GitHub Personal Access Token\n' +
+          '（classic token 需有 repo 權限；\n' +
+          ' fine-grained token 需有 Contents 寫入權限）\n\n' +
+          '⚠️ Token 僅存在你瀏覽器的 localStorage，不會傳給第三方。'
+        );
+        if (!token) return;
+        token = token.trim();
+        localStorage.setItem(TOKEN_KEY, token);
+      }
+
+      // 暫時移除 contenteditable，取得乾淨的 HTML
+      setEditables(false);
+      document.body.classList.remove('edit-mode');
+      document.getElementById('editBar').classList.remove('show');
+
+      const html = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+
+      // 恢復編輯狀態
+      document.body.classList.add('edit-mode');
+      document.getElementById('editBar').classList.add('show');
+      setEditables(true);
+
+      setStatus('🔄 推送中…');
+
+      try {
+        const headers = {
+          Authorization: `token ${token}`,
+          Accept: 'application/vnd.github.v3+json',
+          'Content-Type': 'application/json',
+        };
+
+        // 取得目前檔案的 SHA（更新必要）
+        const getRes = await fetch(
+          `https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${GH_FILE}`,
+          { headers }
+        );
+        if (!getRes.ok) {
+          const err = await getRes.json();
+          throw new Error(err.message || `HTTP ${getRes.status}`);
+        }
+        const { sha } = await getRes.json();
+
+        // UTF-8 → Base64（支援中文）
+        const bytes = new TextEncoder().encode(html);
+        const binStr = Array.from(bytes, b => String.fromCodePoint(b)).join('');
+        const content = btoa(binStr);
+
+        // 推送
+        const putRes = await fetch(
+          `https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${GH_FILE}`,
+          {
+            method: 'PUT',
+            headers,
+            body: JSON.stringify({
+              message: '✏️ 更新行程內容（網頁直接編輯）',
+              content,
+              sha,
+            }),
+          }
+        );
+
+        if (putRes.ok) {
+          setStatus('✅ 推送成功！約 1 分鐘後更新');
+        } else {
+          const err = await putRes.json();
+          if (err.message?.includes('Bad credentials')) {
+            localStorage.removeItem(TOKEN_KEY);
+            setStatus('❌ Token 無效，已清除，請重試');
+          } else {
+            throw new Error(err.message || `HTTP ${putRes.status}`);
+          }
+        }
+      } catch(e) {
+        setStatus('❌ ' + e.message);
+        console.error(e);
+      }
+    }
   </script>
 </body>
 </html>
